@@ -109,16 +109,16 @@ let mapState = {
     drawnShapes: []
 };
 
-// Mapping tool type to key
 const toolTypeMap = {
     firespot: "fireSpots",
     firebreaker: "fireBreakers",
     waterbucket: "waterBuckets"
 };
 
-// Storage of all map-added icons (from tool clicks)
 let mapToolItems = [];
+let activeTool = null;
 
+// Update the output JSON
 function updateDataTab() {
     const output = document.getElementById('data-output');
     if (output) {
@@ -126,14 +126,13 @@ function updateDataTab() {
     }
 }
 
+// Rescan map items (drawings + tool clicks)
 function rescanMap() {
-    // Reset
     mapState.fireSpots = [];
     mapState.fireBreakers = [];
     mapState.waterBuckets = [];
     mapState.drawnShapes = [];
 
-    // Rescan drawn shapes
     drawnItems.eachLayer(layer => {
         const geojson = layer.toGeoJSON();
         mapState.drawnShapes.push({
@@ -142,36 +141,35 @@ function rescanMap() {
         });
     });
 
-    // Rebuild tool-based items from saved references
     mapToolItems.forEach(item => {
         if (toolTypeMap[item.type]) {
-            mapState[toolTypeMap[item.type]].push({
-                latlng: item.latlng
-            });
+            mapState[toolTypeMap[item.type]].push({ latlng: item.latlng });
         }
     });
 
     updateDataTab();
 }
 
-// When a tool is clicked and a location selected
+// Activate continuous tool
 document.querySelectorAll('#tool-list .tool').forEach(tool => {
     tool.addEventListener('click', function () {
-        const toolType = tool.dataset.tool;
-        const handler = function (e) {
-            mapToolItems.push({ type: toolType, latlng: e.latlng });
-            map.off('click', handler);
-        };
-        map.on('click', handler);
+        activeTool = tool.dataset.tool;
     });
 });
 
-// Draw events simply add to drawnItems (we'll rescan later)
+// Capture map clicks for active tool
+map.on('click', function (e) {
+    if (activeTool) {
+        mapToolItems.push({ type: activeTool, latlng: e.latlng });
+    }
+});
+
+// Hook Leaflet draw events
 map.on('draw:created', function (e) {
     drawnItems.addLayer(e.layer);
 });
 map.on('draw:deleted', function () {});
 map.on('draw:edited', function () {});
 
-// Re-scan the entire map every second for live data sync
+// Re-scan map every second
 setInterval(rescanMap, 1000);
