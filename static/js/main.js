@@ -42,13 +42,20 @@ map.on('draw:created', function (e) {
 
 let activeTool = null;
 
+
 document.querySelectorAll('.tool').forEach(item => {
     item.addEventListener('click', function () {
+        const isActive = item.classList.contains('active');
         document.querySelectorAll('.tool').forEach(tool => tool.classList.remove('active'));
-        item.classList.add('active');
-        activeTool = item.getAttribute('data-tool');
+        if (!isActive) {
+            item.classList.add('active');
+            activeTool = item.getAttribute('data-tool');
+        } else {
+            activeTool = null;
+        }
     });
 });
+    
 
 map.on('click', function (e) {
     const emojiMap = {
