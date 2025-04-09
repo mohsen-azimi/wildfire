@@ -108,7 +108,10 @@
             ✅ Simulation complete.
         </div>
     </div>
-    <div id="data-tab" class="tab-content"><pre id="data-output">{}</pre></div>
+    <div id="data-tab" class="tab-content">
+<div style="margin-bottom:10px;"><button onclick="exportData()">Export</button>
+<input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)">
+<button onclick="document.getElementById(\'import-input\').click()">Import</button></div><pre id="data-output" style="max-height: 300px; overflow-y: auto;">{}</pre></div>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

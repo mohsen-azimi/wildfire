@@ -103,7 +103,6 @@ document.querySelectorAll('.layer-check').forEach(input => {
 // --- Dynamic Data Tab Update ---
 
 let addedItems = [];
-let drawingMode = false;
 
 function updateDataTab() {
     const output = document.getElementById('data-output');
@@ -112,7 +111,7 @@ function updateDataTab() {
     }
 }
 
-// Handle left-panel tools (no phantom marker on initial load)
+// Handle left-panel tools (record click, do not show any icons)
 document.querySelectorAll('#tool-list .tool').forEach(tool => {
     tool.addEventListener('click', function () {
         const toolType = tool.dataset.tool;
@@ -122,15 +121,14 @@ document.querySelectorAll('#tool-list .tool').forEach(tool => {
                 latlng: e.latlng
             };
             addedItems.push(item);
-            L.marker(e.latlng).addTo(map);
             updateDataTab();
-            map.off('click', handler); // remove after single click
+            map.off('click', handler); // ensure one-time use
         };
         map.on('click', handler);
     });
 });
 
-// Handle drawn shapes and update data tab each time
+// Track drawn shapes
 map.on('draw:created', function (e) {
     const layer = e.layer;
     const type = e.layerType;
@@ -139,6 +137,49 @@ map.on('draw:created', function (e) {
         type: type,
         geojson: geojson
     });
-    drawnItems.addLayer(layer);
+    drawnItems.addLayer(layer);  // show drawn shape
     updateDataTab();
 });
+
+
+// --- Export/Import Enhancements ---
+
+function exportData() {
+    const blob = new Blob([JSON.stringify(addedItems, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'map_data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    addedItems.push(item);
+                    if (item.latlng) {
+                        // Don't place any icons, just register
+                        return;
+                    }
+                    if (item.geojson) {
+                        const layer = L.geoJSON(item.geojson).getLayers()[0];
+                        drawnItems.addLayer(layer);
+                    }
+                });
+                updateDataTab();
+            } else {
+                alert("Invalid JSON format.");
+            }
+        } catch (err) {
+            alert("Error reading file.");
+        }
+    };
+    reader.readAsText(file);
+}
