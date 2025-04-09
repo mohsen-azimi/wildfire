@@ -102,34 +102,76 @@ document.querySelectorAll('.layer-check').forEach(input => {
 
 // --- Dynamic Data Tab Update ---
 
-let addedItems = [];
+let mapState = {
+    fireSpots: [],
+    fireBreakers: [],
+    waterBuckets: [],
+    drawnShapes: []
+};
 
-function updateDataTabFromMap() {
-    addedItems = [];
+// Mapping tool type to key
+const toolTypeMap = {
+    firespot: "fireSpots",
+    firebreaker: "fireBreakers",
+    waterbucket: "waterBuckets"
+};
+
+// Storage of all map-added icons (from tool clicks)
+let mapToolItems = [];
+
+function updateDataTab() {
+    const output = document.getElementById('data-output');
+    if (output) {
+        output.textContent = JSON.stringify(mapState, null, 2);
+    }
+}
+
+function rescanMap() {
+    // Reset
+    mapState.fireSpots = [];
+    mapState.fireBreakers = [];
+    mapState.waterBuckets = [];
+    mapState.drawnShapes = [];
+
+    // Rescan drawn shapes
     drawnItems.eachLayer(layer => {
         const geojson = layer.toGeoJSON();
-        addedItems.push({
+        mapState.drawnShapes.push({
             type: geojson.geometry.type,
             geojson: geojson
         });
     });
-    const output = document.getElementById('data-output');
-    if (output) {
-        output.textContent = JSON.stringify(addedItems, null, 2);
-    }
+
+    // Rebuild tool-based items from saved references
+    mapToolItems.forEach(item => {
+        if (toolTypeMap[item.type]) {
+            mapState[toolTypeMap[item.type]].push({
+                latlng: item.latlng
+            });
+        }
+    });
+
+    updateDataTab();
 }
 
-// Realtime sync on map changes
-map.on('draw:created', function (e) {
-    drawnItems.addLayer(e.layer);
-    updateDataTabFromMap();
-});
-map.on('draw:deleted', function () {
-    updateDataTabFromMap();
-});
-map.on('draw:edited', function () {
-    updateDataTabFromMap();
+// When a tool is clicked and a location selected
+document.querySelectorAll('#tool-list .tool').forEach(tool => {
+    tool.addEventListener('click', function () {
+        const toolType = tool.dataset.tool;
+        const handler = function (e) {
+            mapToolItems.push({ type: toolType, latlng: e.latlng });
+            map.off('click', handler);
+        };
+        map.on('click', handler);
+    });
 });
 
-// Call once on load in case of imported data
-updateDataTabFromMap();
+// Draw events simply add to drawnItems (we'll rescan later)
+map.on('draw:created', function (e) {
+    drawnItems.addLayer(e.layer);
+});
+map.on('draw:deleted', function () {});
+map.on('draw:edited', function () {});
+
+// Re-scan the entire map every second for live data sync
+setInterval(rescanMap, 1000);
