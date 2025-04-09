@@ -39,11 +39,27 @@ map.on('draw:created', function (e) {
 });
 
 // Tool switching
+
+let activeTool = null;
+
 document.querySelectorAll('.tool').forEach(item => {
     item.addEventListener('click', function () {
         document.querySelectorAll('.tool').forEach(tool => tool.classList.remove('active'));
         item.classList.add('active');
+        activeTool = item.getAttribute('data-tool');
     });
+});
+
+map.on('click', function (e) {
+    if (activeTool === 'firespot') {
+        const emojiIcon = L.divIcon({
+            className: 'emoji-icon',
+            html: '🔥',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        L.marker(e.latlng, { icon: emojiIcon }).addTo(map);
+    }
 });
 
 // Full panel collapse
