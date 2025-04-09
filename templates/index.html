@@ -7,59 +7,97 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        .tabs {
+            display: flex;
+            justify-content: flex-start;
+            margin: 20px 0 10px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            margin-right: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .tab-button.active {
+            background-color: white;
+            font-weight: bold;
+            border-top: 2px solid #007bff;
+            border-bottom: 1px solid white;
+        }
+
+        .tab-content-container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    
-<header class="bg-dark text-white py-3 px-4 d-flex justify-content-center align-items-center" style="font-family: 'Inter', sans-serif;">
-    <img src="/static/assets/ubc.png" alt="UBC Logo" style="max-height: 50px; margin-right: 1rem;">
+
+<header class="bg-dark text-white py-4 d-flex flex-column justify-content-center align-items-center text-center" style="font-family: 'Inter', sans-serif;">
+    <img src="/static/assets/ubc.png" alt="UBC Logo" style="max-height: 50px; margin-bottom: 1rem;">
     <div class="text-center">
         <h2 class="mb-0">UBC-ROGERS FireEdge-AI</h2>
         <small>Wildfire Simulation and Analysis Platform</small>
     </div>
-    <img src="/static/assets/fireedge.png" alt="FireEdge Logo" style="max-height: 50px; margin-left: 1rem;">
+    <img src="/static/assets/fireedge.png" alt="FireEdge Logo" style="max-height: 50px; margin-top: 1rem;">
 </header>
 
-    <div id="container">
-        <div id="left-panel" class="panel">
-            <button id="toggle-left">☰</button>
-            
-<h3>Add</h3>
-<ul id="tool-list">
-    <li class="tool" data-tool="firespot">🔥 FireSpot</li>
-    <li class="tool" data-tool="firebreaker">🔷 FireBreaker</li>
-    <li class="tool" data-tool="waterbucket">💧 WaterBucket</li>
-</ul>
-
-
-
-        </div>
-        <div id="main-panel">
-            <div id="toolbar">
-                <label for="basemap-select">Base Map:</label>
-                <select id="basemap-select">
-                    <option value="osm">OpenStreetMap</option>
-                    <option value="google">Google Roads</option>
-                    <option value="satellite">Google Satellite</option>
-                    <option value="terrain">Terrain</option>
-                </select>
-            </div>
-            <div id="map"></div>
-        </div>
-        <div id="right-panel" class="panel">
-            <h3>Map Layers</h3>
-            <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer1" checked> Layer1</div>
-            <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer2"> Layer2</div>
-            <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer3"> Layer3</div>
-        </div>
+<div id="container">
+    <div id="left-panel" class="panel">
+        <button id="toggle-left">☰</button>
+        <h3>Add</h3>
+        <ul id="tool-list">
+            <li class="tool" data-tool="firespot">🔥 FireSpot</li>
+            <li class="tool" data-tool="firebreaker">🔷 FireBreaker</li>
+            <li class="tool" data-tool="waterbucket">💧 WaterBucket</li>
+        </ul>
     </div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-    <script src="/static/js/main.js"></script>
+    <div id="main-panel">
+        <div id="toolbar">
+            <label for="basemap-select">Base Map:</label>
+            <select id="basemap-select">
+                <option value="empty">Empty Base Map</option>
+                <option value="osm">OpenStreetMap</option>
+                <option value="google">Google Roads</option>
+                <option value="satellite">Google Satellite</option>
+                <option value="terrain">Terrain</option>
+            </select>
+        </div>
+        <div id="map"></div>
+    </div>
+    <div id="right-panel" class="panel">
+        <h3>Map Layers</h3>
+        <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer1" checked> Layer1</div>
+        <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer2"> Layer2</div>
+        <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer3"> Layer3</div>
+    </div>
+</div>
 
-    <div class="container mt-4 text-center">
-        <button id="run-button" class="btn btn-success btn-lg">
-            ▶️ Run Simulation
-        </button>
+<div class="tabs">
+    <button class="tab-button active" data-tab="simulation-tab">Simulation</button>
+    <button class="tab-button" data-tab="data-tab">Data</button>
+</div>
+<div class="tab-content-container">
+    <div id="simulation-tab" class="tab-content active">
+        <button id="run-button" class="btn btn-success btn-lg">▶️ Run Simulation</button>
         <div id="progress-indicator" class="mt-3" style="display: none;">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Running...</span>
@@ -70,23 +108,41 @@
             ✅ Simulation complete.
         </div>
     </div>
+    <div id="data-tab" class="tab-content"><pre id="data-output">{}</pre></div>
+</div>
 
-    <script>
-        document.getElementById('run-button').addEventListener('click', () => {
-            const btn = document.getElementById('run-button');
-            const progress = document.getElementById('progress-indicator');
-            const done = document.getElementById('done-indicator');
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="/static/js/main.js"></script>
 
-            btn.disabled = true;
-            progress.style.display = 'block';
-            done.style.display = 'none';
+<script>
+    document.getElementById('run-button').addEventListener('click', () => {
+        const btn = document.getElementById('run-button');
+        const progress = document.getElementById('progress-indicator');
+        const done = document.getElementById('done-indicator');
 
-            setTimeout(() => {
-                progress.style.display = 'none';
-                done.style.display = 'block';
-                btn.disabled = false;
-            }, 4000);
+        btn.disabled = true;
+        progress.style.display = 'block';
+        done.style.display = 'none';
+
+        setTimeout(() => {
+            progress.style.display = 'none';
+            done.style.display = 'block';
+            btn.disabled = false;
+        }, 4000);
+    });
+
+    // 🛠 Tab switching logic
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+            button.classList.add('active');
+            document.getElementById(button.dataset.tab).classList.add('active');
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>

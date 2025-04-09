@@ -99,3 +99,42 @@ document.querySelectorAll('.layer-check').forEach(input => {
         }
     });
 });
+
+// --- Dynamic Data Tab Update ---
+
+let addedItems = [];
+
+function updateDataTab() {
+    const output = document.getElementById('data-output');
+    if (output) {
+        output.textContent = JSON.stringify(addedItems, null, 2);
+    }
+}
+
+// Hook tools (FireSpot, FireBreaker, WaterBucket) without labels
+document.querySelectorAll('#tool-list .tool').forEach(tool => {
+    tool.addEventListener('click', function () {
+        map.once('click', function (e) {
+            const item = {
+                type: tool.dataset.tool,
+                latlng: e.latlng
+            };
+            addedItems.push(item);
+            L.marker(e.latlng).addTo(map);
+            updateDataTab();
+        });
+    });
+});
+
+// Hook Leaflet Draw (ensure we track all drawn features)
+map.on('draw:created', function (e) {
+    const layer = e.layer;
+    const type = e.layerType;
+    const geojson = layer.toGeoJSON();
+    addedItems.push({
+        type: type,
+        geojson: geojson
+    });
+    drawnItems.addLayer(layer);
+    updateDataTab();
+});
