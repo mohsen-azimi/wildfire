@@ -103,6 +103,7 @@ document.querySelectorAll('.layer-check').forEach(input => {
 // --- Dynamic Data Tab Update ---
 
 let addedItems = [];
+let drawingMode = false;
 
 function updateDataTab() {
     const output = document.getElementById('data-output');
@@ -111,22 +112,25 @@ function updateDataTab() {
     }
 }
 
-// Hook tools (FireSpot, FireBreaker, WaterBucket) without labels
+// Handle left-panel tools (no phantom marker on initial load)
 document.querySelectorAll('#tool-list .tool').forEach(tool => {
     tool.addEventListener('click', function () {
-        map.once('click', function (e) {
+        const toolType = tool.dataset.tool;
+        const handler = function (e) {
             const item = {
-                type: tool.dataset.tool,
+                type: toolType,
                 latlng: e.latlng
             };
             addedItems.push(item);
             L.marker(e.latlng).addTo(map);
             updateDataTab();
-        });
+            map.off('click', handler); // remove after single click
+        };
+        map.on('click', handler);
     });
 });
 
-// Hook Leaflet Draw (ensure we track all drawn features)
+// Handle drawn shapes and update data tab each time
 map.on('draw:created', function (e) {
     const layer = e.layer;
     const type = e.layerType;
