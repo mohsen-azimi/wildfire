@@ -62,6 +62,27 @@ map.on('click', function (e) {
     }
 });
 
+
+let fireSpotMarkers = [];
+
+map.on('click', function (e) {
+    if (activeTool === 'firespot') {
+        const emojiIcon = L.divIcon({
+            className: 'emoji-icon',
+            html: '🔥',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        const marker = L.marker(e.latlng, { icon: emojiIcon }).addTo(map);
+        fireSpotMarkers.push(marker);
+    }
+});
+
+document.getElementById('reset-map').addEventListener('click', function () {
+    fireSpotMarkers.forEach(marker => map.removeLayer(marker));
+    fireSpotMarkers = [];
+});
+
 // Full panel collapse
 const leftPanel = document.getElementById('left-panel');
 const toggleBtn = document.getElementById('toggle-left');
