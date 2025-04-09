@@ -73,21 +73,24 @@ document.querySelectorAll('.layer-check').forEach(input => {
 
 
 
-let fireSpotMode = false;
+// FireSpot override for rectangle tool
+map.on(L.Draw.Event.CREATED, function (event) {
+    const type = event.layerType;
+    const layer = event.layer;
 
-document.getElementById('add-firespot-btn').addEventListener('click', () => {
-    fireSpotMode = !fireSpotMode;
-    document.getElementById('add-firespot-btn').classList.toggle('active', fireSpotMode);
-});
+    if (type === 'rectangle') {
+        const bounds = layer.getBounds();
+        const center = bounds.getCenter();
 
-map.on('click', function(e) {
-    if (fireSpotMode) {
         const fireIcon = L.divIcon({
             className: 'custom-fire-icon',
             html: '🔥',
             iconSize: [30, 30],
             iconAnchor: [15, 15]
         });
-        L.marker(e.latlng, { icon: fireIcon }).addTo(map);
+
+        L.marker(center, { icon: fireIcon }).addTo(map);
+    } else {
+        drawnItems.addLayer(layer);
     }
 });

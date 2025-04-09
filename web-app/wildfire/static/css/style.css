@@ -86,9 +86,3 @@ body, html {
     line-height: 1;
     text-align: center;
 }
-
-#add-firespot-btn.active {
-    background-color: #ffcc00;
-    color: black;
-    font-weight: bold;
-}
