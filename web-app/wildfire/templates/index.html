@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Wildfire GIS App</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-dark text-white py-3 px-4 d-flex align-items-center" style="font-family: 'Inter', sans-serif;">
+        <img src="/static/assets/ubc.png" alt="UBC Logo" style="max-height: 50px; margin-right: 1rem;">
+        <div>
+            <h2 class="mb-0">UBC-ROGERS FireEdge-AI</h2>
+            <small>Wildfire Simulation and Analysis Platform</small>
+        </div>
+    </header>
+    <div id="container">
+        <div id="left-panel" class="panel">
+            <button id="toggle-left">☰</button>
+            <h3>Fire Tools</h3>
+<button id="add-firespot-btn">🔥 FireSpot</button>
+            <ul id="tool-list">
+                <li class="tool" data-tool="rectangle">🟥 Rectangle</li>
+                <li class="tool" data-tool="polygon">🔷 Polygon</li>
+                <li class="tool" data-tool="polyline">📏 Line</li>
+                <li class="tool" data-tool="marker">📍 Marker</li>
+                <li class="tool" data-tool="firebreaker">🔥 FireBreaker</li>
+                <li class="tool" data-tool="water">💧 Water</li>
+            </ul>
+        </div>
+        <div id="main-panel">
+            <div id="toolbar">
+                <label for="basemap-select">Base Map:</label>
+                <select id="basemap-select">
+                    <option value="osm">OpenStreetMap</option>
+                    <option value="google">Google Roads</option>
+                    <option value="satellite">Google Satellite</option>
+                    <option value="terrain">Terrain</option>
+                </select>
+            </div>
+            <div id="map"></div>
+        </div>
+        <div id="right-panel" class="panel">
+            <h3>Map Layers</h3>
+            <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer1" checked> Layer1</div>
+            <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer2"> Layer2</div>
+            <div class="layer-toggle"><input class="layer-check" type="checkbox" value="Layer3"> Layer3</div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="/static/js/main.js"></script>
+
+    <div class="container mt-4 text-center">
+        <button id="run-button" class="btn btn-success btn-lg">
+            ▶️ Run Simulation
+        </button>
+        <div id="progress-indicator" class="mt-3" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Running...</span>
+            </div>
+            <p class="mt-2">Running simulation...</p>
+        </div>
+        <div id="done-indicator" class="alert alert-success mt-3" style="display: none;">
+            ✅ Simulation complete.
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('run-button').addEventListener('click', () => {
+            const btn = document.getElementById('run-button');
+            const progress = document.getElementById('progress-indicator');
+            const done = document.getElementById('done-indicator');
+
+            btn.disabled = true;
+            progress.style.display = 'block';
+            done.style.display = 'none';
+
+            setTimeout(() => {
+                progress.style.display = 'none';
+                done.style.display = 'block';
+                btn.disabled = false;
+            }, 4000);
+        });
+    </script>
+</body>
+</html>

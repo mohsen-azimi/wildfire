@@ -1,0 +1,94 @@
+body, html {
+    margin: 0;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+}
+#container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+.panel {
+    width: 260px;
+    padding: 15px;
+    background-color: #ffffff;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+    overflow-y: auto;
+    transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+#left-panel {
+    border-right: 1px solid #e5e7eb;
+    position: relative;
+}
+#left-panel.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+#toggle-left {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 9999;
+}
+#main-panel {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+#toolbar {
+    padding: 10px 20px;
+    background-color: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#map {
+    flex-grow: 1;
+    z-index: 1;
+}
+.tool {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: #f1f5f9;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+.tool:hover {
+    background-color: #e0e7ff;
+}
+.tool.active {
+    background-color: #3b82f6;
+    color: white;
+}
+.layer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.custom-fire-icon {
+    font-size: 24px;
+    line-height: 1;
+    text-align: center;
+}
+
+#add-firespot-btn.active {
+    background-color: #ffcc00;
+    color: black;
+    font-weight: bold;
+}

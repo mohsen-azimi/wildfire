@@ -1,0 +1,25 @@
+#metadata-section {
+    margin-top: 20px;
+}
+
+#metadata-section table {
+    font-size: 0.9rem;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#metadata-section th, #metadata-section td {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+#metadata-section th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+#metadata-section tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
